@@ -1,1 +1,1 @@
-Machine Learning Calculus Project
+Machine Learning Project
