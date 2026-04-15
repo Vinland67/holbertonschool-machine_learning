@@ -6,7 +6,7 @@ def poly_derivative(poly):
     """Function that calculates the derivative of a polynomial"""
     if not isinstance(poly, list) or len(poly) == 0:
         return None
-    
+
     # Əgər poly-nin daxilindəkilər rəqəm deyilsə None qaytar
     for x in poly:
         if not isinstance(x, (int, float)):
