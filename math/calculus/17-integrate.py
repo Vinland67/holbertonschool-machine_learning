@@ -8,7 +8,7 @@ def poly_integral(poly, C=0):
         return None
     if not isinstance(C, int):
         return None
-    
+
     # Giriş siyahısındakı hər bir elementin rəqəm olduğunu yoxla
     for x in poly:
         if not isinstance(x, (int, float)):
