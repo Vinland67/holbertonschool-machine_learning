@@ -19,5 +19,5 @@ def mat_mul(mat1, mat2):
                 total += mat1[i][k] * mat2[k][j]
             row.append(total)
         result.append(row)
-    
+
     return result
