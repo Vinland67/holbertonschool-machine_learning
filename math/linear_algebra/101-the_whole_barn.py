@@ -23,5 +23,5 @@ def add_matrices(mat1, mat2):
         if inner_res is None:
             return None
         res.append(inner_res)
-    
+
     return res
