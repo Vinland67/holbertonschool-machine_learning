@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Calculates the determinant of a matrix recursively"""
+"""Calculates the determinant of a matrix recursively without any imports"""
 
 
 def determinant(matrix):
@@ -30,7 +30,7 @@ def determinant(matrix):
     # NxN matris üçün rekursiv determinant hesablama
     det = 0
     for col in range(len(matrix)):
-        # Hər bir elementin minorunu tapırıq (0-cı sətir və 'col'-uncu sütun çıxarılır)
+        # Hər bir elementin minorunu tapırıq
         minor = [row[:col] + row[col + 1:] for row in matrix[1:]]
         # İşarəni təyin edirik (-1)^col
         sign = (-1) ** col
