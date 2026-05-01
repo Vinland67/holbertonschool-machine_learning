@@ -51,13 +51,11 @@ def adjugate(matrix):
 
 def inverse(matrix):
     """Calculates the inverse of a matrix"""
-    # Validasiya 1: Siyahıların siyahısı olub-olmaması
     if not isinstance(matrix, list) or len(matrix) == 0:
         raise TypeError("matrix must be a list of lists")
     if not all(isinstance(row, list) for row in matrix):
         raise TypeError("matrix must be a list of lists")
 
-    # Validasiya 2: Boş və ya kvadrat matris olub-olmaması
     if len(matrix) == 1 and len(matrix[0]) == 0:
         raise ValueError("matrix must be a non-empty square matrix")
 
@@ -65,21 +63,16 @@ def inverse(matrix):
         if len(row) != len(matrix):
             raise ValueError("matrix must be a non-empty square matrix")
 
-    # Determinantı tapırıq
     det = determinant(matrix)
 
-    # Əgər determinant sıfırdırsa, matris sinqulyardır, tərsini hesablamaq olmaz
     if det == 0:
         return None
 
-    # 1x1 matris halı
     if len(matrix) == 1:
         return [[1 / det]]
 
-    # Adjugate matrisini hesablayırıq
     adj = adjugate(matrix)
 
-    # Hər bir elementi determinanta bölürük
     inv_mat = []
     for r in range(len(adj)):
         inv_row = []
