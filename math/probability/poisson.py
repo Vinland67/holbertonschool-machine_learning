@@ -22,20 +22,25 @@ class Poisson:
         """Calculates the value of the PMF for a given number of successes"""
         if not isinstance(k, int):
             k = int(k)
-
         if k < 0:
             return 0
 
-        # e sabiti (2.7182818285)
         e = 2.7182818285
-
-        # k! (faktorial) hesablamaq
         factorial = 1
         for i in range(1, k + 1):
             factorial *= i
 
-        # P(k) = (e^-lambda * lambda^k) / k!
-        # e^-lambda = 1 / (e^lambda)
         pmf_val = ((e ** -self.lambtha) * (self.lambtha ** k)) / factorial
-
         return pmf_val
+
+    def cdf(self, k):
+        """Calculates the value of the CDF for a given number of successes"""
+        if not isinstance(k, int):
+            k = int(k)
+        if k < 0:
+            return 0
+
+        cdf_val = 0
+        for i in range(k + 1):
+            cdf_val += self.pmf(i)
+        return cdf_val
