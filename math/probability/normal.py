@@ -17,10 +17,14 @@ class Normal:
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            
-            # Mean hesablamaq
             self.mean = float(sum(data) / len(data))
-            
-            # Standard Deviation hesablamaq
             sum_diff_sq = sum((x - self.mean) ** 2 for x in data)
             self.stddev = float((sum_diff_sq / len(data)) ** 0.5)
+
+    def z_score(self, x):
+        """Calculates the z-score of a given x-value"""
+        return (x - self.mean) / self.stddev
+
+    def x_value(self, z):
+        """Calculates the x-value of a given z-score"""
+        return self.mean + (z * self.stddev)
