@@ -33,20 +33,30 @@ class Binomial:
         if k < 0 or k > self.n:
             return 0
 
-        # Faktorial funksiyası (internal helper)
         def fact(n):
             res = 1
             for i in range(1, n + 1):
                 res *= i
             return res
 
-        # Kombinasiya: n! / (k! * (n-k)!)
         n_fact = fact(self.n)
         k_fact = fact(k)
         nk_fact = fact(self.n - k)
         combination = n_fact / (k_fact * nk_fact)
 
-        # PMF = combination * (p^k) * ((1-p)^(n-k))
         pmf_val = combination * (self.p ** k) * ((1 - self.p) ** (self.n - k))
-
         return pmf_val
+
+    def cdf(self, k):
+        """Calculates the value of the CDF for a given number of successes"""
+        if not isinstance(k, int):
+            k = int(k)
+        if k < 0:
+            return 0
+        if k > self.n:
+            return 1
+
+        cdf_val = 0
+        for i in range(k + 1):
+            cdf_val += self.pmf(i)
+        return cdf_val
