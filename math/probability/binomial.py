@@ -55,7 +55,6 @@ class Binomial:
             return 0
         if k > self.n:
             return 1
-
         cdf_val = 0
         for i in range(k + 1):
             cdf_val += self.pmf(i)
