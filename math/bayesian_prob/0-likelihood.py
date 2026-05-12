@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-"""Contains the likelihood function for Bayesian probability"""
+"""
+Contains the likelihood function for Bayesian probability.
+"""
 import numpy as np
 
 
 def likelihood(x, n, P):
-    """Calculates the likelihood of obtaining data given hypothetical probabilities"""
-    if not isinstance(n, int) or n <= 0:
+    """
+    Calculates the likelihood of obtaining data given
+    various hypothetical probabilities.
+
+    Args:
+        x: number of patients with severe side effects
+        n: total number of patients observed
+        P: 1D numpy.ndarray of hypothetical probabilities
+
+    Returns:
+        1D numpy.ndarray containing the likelihood for each probability in P
+    """
+    if not isinstance(n, (int, np.integer)) or n <= 0:
         raise ValueError("n must be a positive integer")
-    if not isinstance(x, int) or x < 0:
+    if not isinstance(x, (int, np.integer)) or x < 0:
         raise ValueError("x must be an integer that is greater than or equal to 0")
     if x > n:
         raise ValueError("x cannot be greater than n")
@@ -16,17 +29,15 @@ def likelihood(x, n, P):
     if np.any((P < 0) | (P > 1)):
         raise ValueError("All values in P must be in the range [0, 1]")
 
+    # Faktorial hesablama
     def fact(n):
         res = 1
         for i in range(1, n + 1):
             res *= i
         return res
 
-    n_fact = fact(n)
-    x_fact = fact(x)
-    nx_fact = fact(n - x)
-    combination = n_fact / (x_fact * nx_fact)
+    # Binomial Coefficient: n! / (x! * (n-x)!)
+    combination = fact(n) / (fact(x) * fact(n - x))
 
-    l_val = combination * (P ** x) * ((1 - P) ** (n - x))
-
-    return l_val
+    # Likelihood formula: P(data|hypo) = (nCx) * (p^x) * ((1-p)^(n-x))
+    return combination * (P ** x) * ((1 - P) ** (n - x))
