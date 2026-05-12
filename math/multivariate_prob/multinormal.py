@@ -21,19 +21,44 @@ class MultiNormal:
         if not isinstance(data, np.ndarray) or len(data.shape) != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
 
-        # d = dimensions, n = number of data points
         d, n = data.shape
-
         if n < 2:
             raise ValueError("data must contain multiple data points")
 
-        # Mean hesablama: Hər dimensiya üçün (sətirlər üzrə, axis=1)
-        # Formanın (d, 1) olması üçün keepdims=True istifadə edirik
         self.mean = np.mean(data, axis=1, keepdims=True)
-
-        # Data mərkəzləşdirmə
         X_centered = data - self.mean
-
-        # Covariance hesablama: (d, n) * (n, d) -> (d, d)
-        # Düstur: (1 / (n - 1)) * (X_centered @ X_centered.T)
         self.cov = np.matmul(X_centered, X_centered.T) / (n - 1)
+
+    def pdf(self, x):
+        """
+        Calculates the PDF at a data point x.
+
+        Args:
+            x: numpy.ndarray of shape (d, 1) containing the data point
+
+        Returns:
+            The value of the PDF at x.
+        """
+        if not isinstance(x, np.ndarray):
+            raise TypeError("x must be a numpy.ndarray")
+
+        d = self.mean.shape[0]
+        if x.shape != (d, 1):
+            raise ValueError("x must have the shape ({}, 1)".format(d))
+
+        # Det və Inv hesablayırıq
+        det = np.linalg.det(self.cov)
+        inv = np.linalg.inv(self.cov)
+
+        # Məxrəc: sqrt((2 * pi)^d * det)
+        denom = np.sqrt(((2 * np.pi) ** d) * det)
+
+        # Üst (Exponent) hissəsi: -0.5 * (x - mu).T @ inv @ (x - mu)
+        diff = x - self.mean
+        exponent = -0.5 * np.matmul(np.matmul(diff.T, inv), diff)
+
+        # PDF = (1 / denom) * exp(exponent)
+        # Nəticə 1x1 matris olduğu üçün item() ilə skalyar alırıq
+        pdf_val = (1 / denom) * np.exp(exponent)
+
+        return pdf_val.item()
