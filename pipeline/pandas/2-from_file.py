@@ -7,6 +7,6 @@ import pandas as pd
 
 def from_file(filename, delimiter):
     """
-    Verilmiş ayırıcıdan (delimiter) istifadə edərək faylı pd.DataFrame kimi yükləyir.
+    Faylı pd.DataFrame kimi yükləyir.
     """
     return pd.read_csv(filename, sep=delimiter)
