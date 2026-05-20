@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-Creates a pd.DataFrame from a np.ndarray
+Modul NumPy massivindən Pandas DataFrame yaradılmasını təmin edir.
 """
 import pandas as pd
 
 
 def from_numpy(array):
     """
-    Converts a numpy array into a pandas dataframe
-    with alphabetical column labels.
+    NumPy massivindən Pandas DataFrame yaradır.
+
+    Sütunlar əlifba sırası ilə böyük hərflərlə (A, B, C...) adlandırılır.
+    Maksimum 26 sütun dəstəklənir.
     """
     num_cols = array.shape[1]
     columns = [chr(65 + i) for i in range(num_cols)]
