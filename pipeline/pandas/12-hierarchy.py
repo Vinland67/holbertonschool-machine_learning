@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Modul MultiIndex strukturunu dəyişib iyerarxiya qurmaq üçün funksiya təmin edir.
+Modul MultiIndex qurmaq üçün funksiya təmin edir.
 """
 import pandas as pd
 index = __import__('10-index').index
@@ -8,24 +8,24 @@ index = __import__('10-index').index
 
 def hierarchy(df1, df2):
     """
-    Dataframe-ləri birləşdirir, Timestamp-i ilk səviyyə edir və sıralayır.
+    Dataframe-ləri birləşdirir və iyerarxiya qurur.
     """
-    df1_indexed = index(df1)
-    df2_indexed = index(df2)
+    df1_idx = index(df1)
+    df2_idx = index(df2)
 
-    # Lazımi zaman aralığını (1417411980 - 1417417980) filtrləyirik
-    start, end = 1417411980, 1417417980
-    df1_filtered = df1_indexed.loc[start:end]
-    df2_filtered = df2_indexed.loc[start:end]
+    # Zaman aralığını filtrləyirik
+    st, en = 1417411980, 1417417980
+    df1_f = df1_idx.loc[st:en]
+    df2_f = df2_idx.loc[st:en]
 
-    # DataFrame-ləri etiketlər ilə birləşdiririk
+    # Qısa sətirlərlə concat edirik
     df = pd.concat(
-        [df2_filtered, df1_filtered],
+        [df2_f, df1_f],
         keys=['bitstamp', 'coinbase']
     )
 
-    # İndeks səviyyələrinin yerini dəyişirik (Timestamp ilk səviyyə olur)
+    # İndeks səviyyələrinin yerini dəyişirik
     df = df.swaplevel(0, 1, axis=0)
 
-    # Məlumatları xronoloji ardıcıllıqla çeşidləyirik
+    # Xronoloji ardıcıllıqla çeşidləyirik
     return df.sort_index()
