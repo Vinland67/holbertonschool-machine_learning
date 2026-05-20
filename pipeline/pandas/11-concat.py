@@ -16,5 +16,8 @@ def concat(df1, df2):
     # 1417411920 daxil olmaqla df2-ni filtrləyirik
     df2_filtered = df2_indexed.loc[:1417411920]
 
-    # df2-ni df1-in üzərinə keys (etiketlər) əlavə edərək birləşdiririk
-    return pd.concat([df2_filtered, df1_indexed], keys=['bitstamp', 'coinbase'])
+    # Sətir uzunluğunu qorumaq üçün pd.concat-ı bölürük
+    return pd.concat(
+        [df2_filtered, df1_indexed],
+        keys=['bitstamp', 'coinbase']
+    )
