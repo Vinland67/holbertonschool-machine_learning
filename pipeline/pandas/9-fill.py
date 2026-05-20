@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Modul DataFrame daxilindəki boş (NaN) dəyərləri doldurmaq üçün funksiya təmin edir.
+Modul DataFrame daxilindəki boş dəyərləri doldurur.
 """
 
 
 def fill(df):
     """
-    NaN dəyərləri şərtlərə uyğun doldurur və Weighted_Price sütununu silir.
+    NaN dəyərləri şərtlərə uyğun doldurur və lazımsız sütunu silir.
     """
     # 1. Weighted_Price sütununu silirik
     df = df.drop(columns=['Weighted_Price'])
 
-    # 2. Close sütunundakı NaN dəyərləri əvvəlki sətrin dəyəri ilə doldururuq
+    # 2. Close sütununu ffill ilə doldururuq
     df['Close'] = df['Close'].ffill()
 
-    # 3. High, Low və Open sütunlarını eyni sətirdəki Close dəyəri ilə doldururuq
+    # 3. High, Low və Open sütunlarını eyni sətirdəki Close ilə doldururuq
     df['High'] = df['High'].fillna(df['Close'])
     df['Low'] = df['Low'].fillna(df['Close'])
     df['Open'] = df['Open'].fillna(df['Close'])
