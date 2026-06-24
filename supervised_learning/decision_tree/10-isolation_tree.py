@@ -6,6 +6,19 @@ Node = __import__('8-build_decision_tree').Node
 Leaf = __import__('8-build_decision_tree').Leaf
 
 
+class Isolation_Leaf(Leaf):
+    """Represents a leaf in an isolation tree"""
+
+    def __init__(self, depth=None):
+        """Initialize an Isolation_Leaf"""
+        super().__init__(value=depth)
+        self.depth = depth
+
+    def pred(self, x):
+        """Returns the depth of the leaf"""
+        return self.depth
+
+
 class Isolation_Random_Tree():
     """Represents an isolation random tree"""
 
@@ -42,7 +55,7 @@ class Isolation_Random_Tree():
         return self.root.get_leaves_below()
 
     def update_predict(self):
-        """Computes the prediction function using pred method"""
+        """Computes the prediction function"""
         self.predict = lambda A: np.array(
             [self.root.pred(x) for x in A]
         )
@@ -65,8 +78,7 @@ class Isolation_Random_Tree():
 
     def get_leaf_child(self, node, sub_population):
         """Returns a leaf child node"""
-        leaf_child = Leaf(value=node.depth + 1)
-        leaf_child.depth = node.depth + 1
+        leaf_child = Isolation_Leaf(depth=node.depth + 1)
         leaf_child.subpopulation = sub_population
         return leaf_child
 
