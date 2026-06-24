@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module for Isolation Random Forest
+Module for Isolation Random Forest for outlier detection
 """
 import numpy as np
 Isolation_Random_Tree = __import__('10-isolation_tree').Isolation_Random_Tree
@@ -23,14 +23,14 @@ class Isolation_Random_Forest():
 
     def predict(self, explanatory):
         """
-        Predicts the mean depth for each individual in the explanatory array
+        Predicts the mean depth across all isolation trees
         """
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
         return predictions.mean(axis=0)
 
     def fit(self, explanatory, n_trees=100, verbose=0):
         """
-        Fits the isolation random forest to the explanatory data
+        Fits the isolation forest to the explanatory data
         """
         self.explanatory = explanatory
         self.numpy_preds = []
@@ -55,7 +55,8 @@ class Isolation_Random_Forest():
 
     def suspects(self, explanatory, n_suspects):
         """
-        Returns the n_suspects rows in explanatory with smallest mean depth
+        Returns the n_suspects rows in explanatory that have
+        the smallest mean depth along with their depths
         """
         depths = self.predict(explanatory)
         indices = np.argsort(depths)[:n_suspects]
