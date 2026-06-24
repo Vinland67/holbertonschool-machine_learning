@@ -5,6 +5,7 @@ Module for Isolation Random Tree for outlier detection
 import numpy as np
 Node = __import__('8-build_decision_tree').Node
 Leaf = __import__('8-build_decision_tree').Leaf
+Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 
 
 class Isolation_Random_Tree():
@@ -29,45 +30,37 @@ class Isolation_Random_Tree():
         """
         String representation of the tree
         """
-        return self.root.__str__()
+        return Decision_Tree.__str__(self)
 
     def depth(self):
         """
         Returns the maximum depth of the tree
         """
-        return self.root.depth()
+        return Decision_Tree.depth(self)
 
     def count_nodes(self, only_leaves=False):
         """
         Counts the nodes in the tree
         """
-        return self.root.count_nodes(only_leaves=only_leaves)
+        return Decision_Tree.count_nodes(self, only_leaves=only_leaves)
 
     def update_bounds(self):
         """
         Updates the bounds for each node
         """
-        self.root.update_bounds()
+        Decision_Tree.update_bounds(self)
 
     def get_leaves(self):
         """
         Returns the leaves of the tree
         """
-        return self.root.get_leaves()
+        return Decision_Tree.get_leaves(self)
 
     def update_predict(self):
         """
-        Updates the predict function for the isolation tree
+        Updates the predict function
         """
-        def predict_node(node, x):
-            if isinstance(node, Leaf):
-                return node.value
-            if x[node.feature] < node.threshold:
-                return predict_node(node.left_child, x)
-            else:
-                return predict_node(node.right_child, x)
-
-        self.predict = lambda X: np.array([predict_node(self.root, x) for x in X])
+        Decision_Tree.update_predict(self)
 
     def np_extrema(self, arr):
         """
@@ -77,24 +70,13 @@ class Isolation_Random_Tree():
 
     def random_split_criterion(self, node):
         """
-        Returns a random split criterion
+        Returns a random split criterion using Decision_Tree's method
         """
-        feature = self.rng.integers(0, self.explanatory.shape[1])
-        feature_values = self.explanatory[node.sub_population, feature]
-        
-        if len(feature_values) == 0:
-            return feature, 0.0
-            
-        min_val, max_val = self.np_extrema(feature_values)
-        if min_val == max_val:
-            return feature, min_val
-            
-        threshold = self.rng.uniform(min_val, max_val)
-        return feature, threshold
+        return Decision_Tree.random_split_criterion(self, node)
 
     def get_leaf_child(self, node, sub_population):
         """
-        Creates and returns a leaf child node
+        Creates and returns a leaf child node for Isolation Tree
         """
         leaf_child = Leaf(value=node.depth + 1)
         leaf_child.depth = node.depth + 1
@@ -105,10 +87,7 @@ class Isolation_Random_Tree():
         """
         Creates and returns an internal node child
         """
-        node_child = Node()
-        node_child.depth = node.depth + 1
-        node_child.sub_population = sub_population
-        return node_child
+        return Decision_Tree.get_node_child(self, node, sub_population)
 
     def fit_node(self, node):
         """
