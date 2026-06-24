@@ -71,7 +71,19 @@ class Isolation_Random_Tree():
         """
         Returns a random split criterion
         """
-        return self.root.random_split_criterion(node)
+        # Feature seçimi random tənzimlənir
+        feature = self.rng.integers(0, self.explanatory.shape[1])
+        feature_values = self.explanatory[node.sub_population, feature]
+        
+        if len(feature_values) == 0:
+            return feature, 0.0
+            
+        min_val, max_val = self.np_extrema(feature_values)
+        if min_val == max_val:
+            return feature, min_val
+            
+        threshold = self.rng.uniform(min_val, max_val)
+        return feature, threshold
 
     def get_leaf_child(self, node, sub_population):
         """
