@@ -20,8 +20,8 @@ class Random_Forest():
 
     def predict(self, explanatory):
         """Predicts the class for each individual in explanatory"""
-        all_preds = np.array([pred(explanatory)
-                               for pred in self.numpy_preds])
+        all_preds = np.array(
+            [pred(explanatory) for pred in self.numpy_preds])
         return np.array([
             np.bincount(all_preds[:, i].astype(int)).argmax()
             for i in range(explanatory.shape[0])
