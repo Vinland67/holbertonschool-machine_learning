@@ -57,9 +57,17 @@ class Isolation_Random_Tree():
 
     def update_predict(self):
         """
-        Updates the predict function
+        Updates the predict function for the isolation tree
         """
-        self.root.update_predict()
+        def predict_node(node, x):
+            if isinstance(node, Leaf):
+                return node.value
+            if x[node.feature] < node.threshold:
+                return predict_node(node.left_child, x)
+            else:
+                return predict_node(node.right_child, x)
+
+        self.predict = lambda X: np.array([predict_node(self.root, x) for x in X])
 
     def np_extrema(self, arr):
         """
@@ -71,7 +79,6 @@ class Isolation_Random_Tree():
         """
         Returns a random split criterion
         """
-        # Feature seçimi random tənzimlənir
         feature = self.rng.integers(0, self.explanatory.shape[1])
         feature_values = self.explanatory[node.sub_population, feature]
         
