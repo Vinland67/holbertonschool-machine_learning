@@ -5,11 +5,12 @@ Module for Isolation Random Tree for outlier detection
 import numpy as np
 Node = __import__('8-build_decision_tree').Node
 Leaf = __import__('8-build_decision_tree').Leaf
+Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 
 
-class Isolation_Random_Tree():
+class Isolation_Random_Tree(Decision_Tree):
     """
-    Class that defines an isolation random tree
+    Class that defines an isolation random tree, inheriting from Decision_Tree
     """
     def __init__(self, max_depth=10, seed=0, root=None):
         """
@@ -25,53 +26,6 @@ class Isolation_Random_Tree():
         self.predict = None
         self.min_pop = 1
 
-    def __str__(self):
-        """
-        String representation of the tree
-        """
-        return self.root.__str__() + "\n"
-
-    def depth(self):
-        """
-        Returns the maximum depth of the tree
-        """
-        return self.root.max_depth_below()
-
-    def count_nodes(self, only_leaves=False):
-        """
-        Counts the nodes in the tree
-        """
-        return self.root.count_nodes_below(only_leaves=only_leaves)
-
-    def update_bounds(self):
-        """
-        Updates the bounds for each node
-        """
-        self.root.update_bounds_below()
-
-    def get_leaves(self):
-        """
-        Returns the leaves of the tree
-        """
-        return self.root.get_leaves_below()
-
-    def update_predict(self):
-        """
-        Updates the predict function to return the depth of the leaf
-        """
-        def pred_func(A):
-            results = []
-            for x in A:
-                current = self.root
-                while hasattr(current, 'left_child') and current.left_child is not None:
-                    if x[current.feature] < current.threshold:
-                        current = current.left_child
-                    else:
-                        current = current.right_child
-                results.append(current.depth)
-            return np.array(results)
-        self.predict = pred_func
-
     def np_extrema(self, arr):
         """
         Returns the min and max of an array
@@ -80,47 +34,18 @@ class Isolation_Random_Tree():
 
     def random_split_criterion(self, node):
         """
-        Returns a random split criterion while preventing infinite loops
+        Returns a random split criterion using Decision_Tree's base logic
         """
-        diff = 0
-        features_tried = set()
-        n_features = self.explanatory.shape[1]
-        
-        while diff == 0 and len(features_tried) < n_features:
-            feature = self.rng.integers(0, n_features)
-            features_tried.add(feature)
-            sub = self.explanatory[:, feature][node.sub_population]
-            
-            if len(sub) < 2:
-                continue
-                
-            min_val, max_val = self.np_extrema(sub)
-            diff = max_val - min_val
-            
-        if diff == 0:
-            return 0, 0.0
-            
-        x = self.rng.uniform()
-        threshold = (1 - x) * min_val + x * max_val
-        return feature, threshold
+        return Decision_Tree.random_split_criterion(self, node)
 
     def get_leaf_child(self, node, sub_population):
         """
-        Creates and returns a leaf child node
+        Creates and returns a leaf child node with depth value
         """
         leaf_child = Leaf(value=node.depth + 1)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         return leaf_child
-
-    def get_node_child(self, node, sub_population):
-        """
-        Creates and returns an internal node child
-        """
-        node_child = Node()
-        node_child.depth = node.depth + 1
-        node_child.sub_population = sub_population
-        return node_child
 
     def fit_node(self, node):
         """
@@ -136,6 +61,13 @@ class Isolation_Random_Tree():
             node.sub_population,
             self.explanatory[:, node.feature] >= node.threshold
         )
+
+        # Əgər data eyni nöqtələrdən ibarətdirsə və bölünmürsə, sonsuz dövrəni kəsirik
+        if (np.sum(left_population) == 0 or
+                np.sum(right_population) == 0):
+            node.left_child = self.get_leaf_child(node, node.sub_population)
+            node.right_child = self.get_leaf_child(node, node.sub_population)
+            return
 
         is_left_leaf = (
             node.depth + 1 >= self.max_depth or
