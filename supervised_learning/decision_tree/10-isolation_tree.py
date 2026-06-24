@@ -104,6 +104,13 @@ class Isolation_Random_Tree():
             self.explanatory[:, node.feature] >= node.threshold
         )
 
+        # Əgər bölünmə heç bir nöqtəni ayırmırsa (eyni dəyərlərdirsə), yarpaq edib dərhal dayandırırıq
+        if (np.sum(left_population) == 0 or
+                np.sum(right_population) == 0):
+            node.left_child = self.get_leaf_child(node, node.sub_population)
+            node.right_child = self.get_leaf_child(node, node.sub_population)
+            return
+
         is_left_leaf = (
             node.depth + 1 >= self.max_depth or
             np.sum(left_population) <= self.min_pop
