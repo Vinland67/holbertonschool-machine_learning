@@ -6,19 +6,6 @@ Node = __import__('8-build_decision_tree').Node
 Leaf = __import__('8-build_decision_tree').Leaf
 
 
-class Isolation_Leaf(Leaf):
-    """Represents a leaf in an isolation tree"""
-
-    def __init__(self, depth=None):
-        """Initialize an Isolation_Leaf"""
-        super().__init__(value=depth)
-        self.depth = depth
-
-    def pred(self, x):
-        """Returns the depth of the leaf"""
-        return self.depth
-
-
 class Isolation_Random_Tree():
     """Represents an isolation random tree"""
 
@@ -56,8 +43,14 @@ class Isolation_Random_Tree():
 
     def update_predict(self):
         """Computes the prediction function"""
+        self.update_bounds()
+        leaves = self.get_leaves()
+        for leaf in leaves:
+            leaf.update_indicator()
         self.predict = lambda A: np.array(
-            [self.root.pred(x) for x in A]
+            [leaves[np.argmax(
+                np.array([leaf.indicator(A) for leaf in leaves]), axis=0
+            [i]].depth for i in range(A.shape[0])]
         )
 
     def np_extrema(self, arr):
@@ -78,8 +71,9 @@ class Isolation_Random_Tree():
 
     def get_leaf_child(self, node, sub_population):
         """Returns a leaf child node"""
-        leaf_child = Isolation_Leaf(depth=node.depth + 1)
-        leaf_child.subpopulation = sub_population
+        leaf_child = Leaf()
+        leaf_child.depth = node.depth + 1
+        leaf_child.sub_population = sub_population
         return leaf_child
 
     def get_node_child(self, node, sub_population):
@@ -95,15 +89,15 @@ class Isolation_Random_Tree():
 
         left_population = np.logical_and(
             node.sub_population,
-            self.explanatory[:, node.feature] > node.threshold
+            self.explanatory[:, node.feature] < node.threshold
         )
         right_population = np.logical_and(
             node.sub_population,
-            self.explanatory[:, node.feature] <= node.threshold
+            self.explanatory[:, node.feature] >= node.threshold
         )
 
         is_left_leaf = (
-            np.sum(left_population) < self.min_pop or
+            np.sum(left_population) <= self.min_pop or
             node.depth + 1 >= self.max_depth
         )
 
@@ -114,16 +108,14 @@ class Isolation_Random_Tree():
             self.fit_node(node.left_child)
 
         is_right_leaf = (
-            np.sum(right_population) < self.min_pop or
+            np.sum(right_population) <= self.min_pop or
             node.depth + 1 >= self.max_depth
         )
 
         if is_right_leaf:
-            node.right_child = self.get_leaf_child(
-                node, right_population)
+            node.right_child = self.get_leaf_child(node, right_population)
         else:
-            node.right_child = self.get_node_child(
-                node, right_population)
+            node.right_child = self.get_node_child(node, right_population)
             self.fit_node(node.right_child)
 
     def fit(self, explanatory, verbose=0):
