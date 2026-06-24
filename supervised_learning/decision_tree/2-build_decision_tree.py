@@ -69,6 +69,15 @@ class Node:
             result += self.right_child_add_prefix(str(self.right_child))
         return result.rstrip()
 
+    def get_leaves_below(self):
+        """Returns the list of all leaves below this node"""
+        leaves = []
+        if self.left_child:
+            leaves += self.left_child.get_leaves_below()
+        if self.right_child:
+            leaves += self.right_child.get_leaves_below()
+        return leaves
+
 
 class Leaf(Node):
     """Represents a leaf node in a decision tree"""
@@ -91,6 +100,10 @@ class Leaf(Node):
     def __str__(self):
         """Returns a string representation of the leaf"""
         return f"-> leaf [value={self.value}]"
+
+    def get_leaves_below(self):
+        """Returns this leaf as a list"""
+        return [self]
 
 
 class Decision_Tree():
@@ -121,4 +134,8 @@ class Decision_Tree():
 
     def __str__(self):
         """Returns a string representation of the tree"""
-        return self.root.__str__()
+        return self.root.__str__() + "\n"
+
+    def get_leaves(self):
+        """Returns the list of all leaves in the tree"""
+        return self.root.get_leaves_below()
