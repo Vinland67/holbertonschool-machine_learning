@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""Module for building an isolation random forest"""
-
+"""
+Module for Isolation Random Forest
+"""
 import numpy as np
 Isolation_Random_Tree = __import__('10-isolation_tree').Isolation_Random_Tree
 
 
 class Isolation_Random_Forest():
-    """Represents an isolation random forest"""
-
+    """
+    Class that defines an isolation random forest
+    """
     def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
-        """Initialize an Isolation_Random_Forest"""
+        """
+        Initializes the isolation random forest
+        """
         self.numpy_predicts = []
         self.target = None
         self.numpy_preds = None
@@ -18,12 +22,16 @@ class Isolation_Random_Forest():
         self.seed = seed
 
     def predict(self, explanatory):
-        """Returns mean depth for each individual"""
+        """
+        Predicts the mean depth for each individual in the explanatory array
+        """
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
         return predictions.mean(axis=0)
 
     def fit(self, explanatory, n_trees=100, verbose=0):
-        """Fits the isolation forest to the data"""
+        """
+        Fits the isolation random forest to the explanatory data
+        """
         self.explanatory = explanatory
         self.numpy_preds = []
         depths = []
@@ -31,7 +39,9 @@ class Isolation_Random_Forest():
         leaves = []
         for i in range(n_trees):
             T = Isolation_Random_Tree(
-                max_depth=self.max_depth, seed=self.seed + i)
+                max_depth=self.max_depth,
+                seed=self.seed + i
+            )
             T.fit(explanatory)
             self.numpy_preds.append(T.predict)
             depths.append(T.depth())
@@ -44,7 +54,9 @@ class Isolation_Random_Forest():
     - Mean number of leaves          : { np.array(leaves).mean()      }""")
 
     def suspects(self, explanatory, n_suspects):
-        """Returns the n_suspects rows with the smallest mean depth"""
+        """
+        Returns the n_suspects rows in explanatory with smallest mean depth
+        """
         depths = self.predict(explanatory)
         indices = np.argsort(depths)[:n_suspects]
         return explanatory[indices], depths[indices]
