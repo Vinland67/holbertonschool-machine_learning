@@ -42,15 +42,9 @@ class Isolation_Random_Tree():
         return self.root.get_leaves_below()
 
     def update_predict(self):
-        """Computes the prediction function"""
-        self.update_bounds()
-        leaves = self.get_leaves()
-        for leaf in leaves:
-            leaf.update_indicator()
+        """Computes the prediction function using pred method"""
         self.predict = lambda A: np.array(
-            [leaves[np.argmax(
-                np.array([leaf.indicator(A) for leaf in leaves])[:, i]
-            )].depth for i in range(A.shape[0])]
+            [self.root.pred(x) for x in A]
         )
 
     def np_extrema(self, arr):
