@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Module that defines a deep neural network"""
+"""Module that defines a deep neural network with private attributes"""
 import numpy as np
 
 
@@ -14,19 +14,22 @@ class DeepNeuralNetwork:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
-        if not all(isinstance(n, int) and n > 0 for n in layers):
+
+        types = set(map(type, layers))
+        if types != {int} or min(layers) <= 0:
             raise TypeError("layers must be a list of positive integers")
+
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
         prev = nx
-        for l in range(1, self.__L + 1):
-            self.__weights[f'W{l}'] = (
-                np.random.randn(layers[l - 1], prev) *
+        for idx in range(1, self.__L + 1):
+            self.__weights["W" + str(idx)] = (
+                np.random.randn(layers[idx - 1], prev) *
                 np.sqrt(2 / prev)
             )
-            self.__weights[f'b{l}'] = np.zeros((layers[l - 1], 1))
-            prev = layers[l - 1]
+            self.__weights["b" + str(idx)] = np.zeros((layers[idx - 1], 1))
+            prev = layers[idx - 1]
 
     @property
     def L(self):
