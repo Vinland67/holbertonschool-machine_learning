@@ -14,7 +14,7 @@ class DeepNeuralNetwork:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
-        
+
         types = set(map(type, layers))
         if types != {int} or min(layers) <= 0:
             raise TypeError("layers must be a list of positive integers")
@@ -23,13 +23,13 @@ class DeepNeuralNetwork:
         self.__cache = {}
         self.__weights = {}
         prev = nx
-        for l in range(1, self.__L + 1):
-            self.__weights["W" + str(l)] = (
-                np.random.randn(layers[l - 1], prev) *
+        for idx in range(1, self.__L + 1):
+            self.__weights["W" + str(idx)] = (
+                np.random.randn(layers[idx - 1], prev) *
                 np.sqrt(2 / prev)
             )
-            self.__weights["b" + str(l)] = np.zeros((layers[l - 1], 1))
-            prev = layers[l - 1]
+            self.__weights["b" + str(idx)] = np.zeros((layers[idx - 1], 1))
+            prev = layers[idx - 1]
 
     @property
     def L(self):
@@ -49,10 +49,10 @@ class DeepNeuralNetwork:
     def forward_prop(self, X):
         """Calculates the forward propagation of the neural network"""
         self.__cache["A0"] = X
-        for l in range(1, self.__L + 1):
-            W = self.__weights["W" + str(l)]
-            b = self.__weights["b" + str(l)]
-            A_prev = self.__cache["A" + str(l - 1)]
+        for idx in range(1, self.__L + 1):
+            W = self.__weights["W" + str(idx)]
+            b = self.__weights["b" + str(idx)]
+            A_prev = self.__cache["A" + str(idx - 1)]
             Z = np.dot(W, A_prev) + b
-            self.__cache["A" + str(l)] = 1 / (1 + np.exp(-Z))
+            self.__cache["A" + str(idx)] = 1 / (1 + np.exp(-Z))
         return self.__cache["A" + str(self.__L)], self.__cache
