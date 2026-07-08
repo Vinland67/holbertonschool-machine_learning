@@ -22,8 +22,8 @@ class DeepNeuralNetwork:
         prev = nx
         for l in range(1, self.__L + 1):
             self.__weights["W" + str(l)] = (
-                np.random.randn(layers[l - 1], prev) *
-                np.sqrt(2 / prev)
+                np.random.randn(layers[l - 1], prev)
+                * np.sqrt(2 / prev)
             )
             self.__weights["b" + str(l)] = np.zeros((layers[l - 1], 1))
             prev = layers[l - 1]
