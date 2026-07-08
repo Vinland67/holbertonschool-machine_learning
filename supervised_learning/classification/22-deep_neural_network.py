@@ -59,7 +59,7 @@ class DeepNeuralNetwork:
 
     def cost(self, Y, A):
         """Calculates the cost of the model using logistic regression"""
-        m = Y.shape
+        m = Y.shape[1]
         loss = -(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
         cost = (1 / m) * np.sum(loss)
         return cost
@@ -73,7 +73,7 @@ class DeepNeuralNetwork:
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """Calculates one pass of gradient descent on the neural network"""
-        m = Y.shape
+        m = Y.shape[1]
         dZ = cache["A" + str(self.__L)] - Y
 
         for idx in range(self.__L, 0, -1):
