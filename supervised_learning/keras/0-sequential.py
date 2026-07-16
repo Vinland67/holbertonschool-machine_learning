@@ -19,8 +19,7 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
         kernel_regularizer=K.regularizers.l2(lambtha)
     ))
 
-    # Yalnız o vaxt Dropout əlavə edirik ki, keep_prob < 1 olsun
-    # və ümumi qat sayı 1-dən çox olsun (model with only 1 layer has no dropout)
+    # keep_prob < 1 və ümumi qat sayı 1-dən çoxdursa, Dropout əlavə edirik
     if keep_prob < 1 and len(layers) > 1:
         model.add(K.layers.Dropout(1 - keep_prob))
 
