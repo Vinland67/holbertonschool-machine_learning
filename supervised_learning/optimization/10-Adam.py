@@ -16,8 +16,6 @@ def create_Adam_op(alpha, beta1, beta2, epsilon):
 
     Returns: optimizer
     """
-    optimizer = tf.keras.optimizers.Adam(learning_rate=alpha,
-                                          beta_1=beta1,
-                                          beta_2=beta2,
-                                          epsilon=epsilon)
+    optimizer = tf.keras.optimizers.Adam(
+        learning_rate=alpha, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
     return optimizer
