@@ -18,7 +18,9 @@ def l2_reg_cost(cost, model):
         the network, accounting for L2 regularization
     """
     l2_costs = []
+    total = 0
     for loss in model.losses:
-        l2_costs.append(cost + loss)
+        total += loss
+        l2_costs.append(cost + total)
 
     return tf.stack(l2_costs)
