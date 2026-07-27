@@ -27,7 +27,7 @@ def create_batch_norm_layer(prev, n, activation):
 
     mean, variance = tf.nn.moments(Z, axes=[0])
     epsilon = 1e-7
-    Z_norm = tf.nn.batch_normalization(Z, mean, variance, beta, gamma,
-                                        epsilon)
+    Z_norm = tf.nn.batch_normalization(
+        Z, mean, variance, beta, gamma, epsilon)
 
     return activation(Z_norm)
