@@ -62,7 +62,7 @@ def inception_network():
         inception5a, [384, 192, 384, 48, 128, 128])
 
     avg_pool = K.layers.AveragePooling2D(
-        pool_size=(7, 7), strides=(1, 1), padding='same')(inception5b)
+        pool_size=(7, 7), strides=(1, 1), padding='valid')(inception5b)
 
     dropout = K.layers.Dropout(rate=0.4)(avg_pool)
 
