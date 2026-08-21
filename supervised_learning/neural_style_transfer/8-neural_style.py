@@ -17,12 +17,6 @@ class NST:
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
         """
         Class constructor for NST
-
-        Args:
-            style_image: numpy.ndarray of shape (h, w, 3)
-            content_image: numpy.ndarray of shape (h, w, 3)
-            alpha: weight for content cost
-            beta: weight for style cost
         """
         if not isinstance(style_image, np.ndarray) or \
            style_image.ndim != 3 or style_image.shape[2] != 3:
@@ -56,12 +50,6 @@ class NST:
         """
         Rescales an image such that its pixels values are between 0 and 1
         and its largest side is 512 pixels
-
-        Args:
-            image: numpy.ndarray of shape (h, w, 3)
-
-        Returns:
-            scaled image as tf.Tensor
         """
         if not isinstance(image, np.ndarray) or \
            image.ndim != 3 or image.shape[2] != 3:
@@ -93,7 +81,6 @@ class NST:
         """
         Creates the model used to calculate cost using VGG19 as a base.
         Replaces MaxPooling2D layers with AveragePooling2D layers.
-        Saves model to self.model.
         """
         vgg = tf.keras.applications.VGG19(
             include_top=False,
@@ -129,13 +116,6 @@ class NST:
     def gram_matrix(input_layer):
         """
         Calculates the Gram matrix of an input layer
-
-        Args:
-            input_layer: instance of tf.Tensor or tf.Variable of shape
-                         (1, h, w, c)
-
-        Returns:
-            a tf.Tensor of shape (1, c, c) containing the gram matrix
         """
         if not isinstance(input_layer, (tf.Tensor, tf.Variable)) or \
            len(input_layer.shape) != 4:
@@ -152,7 +132,6 @@ class NST:
     def generate_features(self):
         """
         Extracts the features used to calculate neural style cost.
-        Sets gram_style_features and content_feature attributes.
         """
         style_preprocessed = tf.keras.applications.vgg19.preprocess_input(
             self.style_image * 255.0
@@ -173,15 +152,6 @@ class NST:
     def layer_style_cost(self, style_output, gram_target):
         """
         Calculates the style cost for a single layer
-
-        Args:
-            style_output: tf.Tensor of shape (1, h, w, c) containing the
-                          layer style output of the generated image
-            gram_target: tf.Tensor of shape (1, c, c) the gram matrix of the
-                         target style output for that layer
-
-        Returns:
-            the layer's style cost
         """
         if not isinstance(style_output, (tf.Tensor, tf.Variable)) or \
            len(style_output.shape) != 4:
@@ -200,13 +170,6 @@ class NST:
     def style_cost(self, style_outputs):
         """
         Calculates the style cost for generated image
-
-        Args:
-            style_outputs: a list of tf.Tensor style outputs for the
-                           generated image
-
-        Returns:
-            the style cost
         """
         num_layers = len(self.style_layers)
         if not isinstance(style_outputs, list) or \
@@ -230,13 +193,6 @@ class NST:
     def content_cost(self, content_output):
         """
         Calculates the content cost for the generated image
-
-        Args:
-            content_output: a tf.Tensor containing the content output
-                            for the generated image
-
-        Returns:
-            the content cost
         """
         s = self.content_feature.shape
         if not isinstance(content_output, (tf.Tensor, tf.Variable)) or \
@@ -252,13 +208,6 @@ class NST:
     def total_cost(self, generated_image):
         """
         Calculates the total cost for the generated image
-
-        Args:
-            generated_image: a tf.Tensor of shape (1, nh, nw, 3)
-                             containing the generated image
-
-        Returns:
-            a tuple (J, J_content, J_style)
         """
         s = self.content_image.shape
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)) or \
@@ -285,12 +234,6 @@ class NST:
     def compute_grads(self, generated_image):
         """
         Calculates the gradients for the tf.Tensor generated image
-
-        Args:
-            generated_image: a tf.Tensor of shape (1, nh, nw, 3)
-
-        Returns:
-            a tuple (gradients, J_total, J_content, J_style)
         """
         s = self.content_image.shape
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)) or \
