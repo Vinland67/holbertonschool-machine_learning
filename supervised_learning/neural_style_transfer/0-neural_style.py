@@ -17,6 +17,12 @@ class NST:
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
         """
         Class constructor for NST
+
+        Args:
+            style_image: numpy.ndarray of shape (h, w, 3)
+            content_image: numpy.ndarray of shape (h, w, 3)
+            alpha: weight for content cost
+            beta: weight for style cost
         """
         if not isinstance(style_image, np.ndarray) or \
            style_image.ndim != 3 or style_image.shape[2] != 3:
@@ -30,22 +36,30 @@ class NST:
                 "content_image must be a numpy.ndarray with shape (h, w, 3)"
             )
 
-        if not isinstance(alpha, (int, float)) or alpha < 0:
+        if not isinstance(alpha, (int, float)) or isinstance(alpha, bool) \
+           or alpha < 0:
             raise TypeError("alpha must be a non-negative number")
 
-        if not isinstance(beta, (int, float)) or beta < 0:
+        if not isinstance(beta, (int, float)) or isinstance(beta, bool) \
+           or beta < 0:
             raise TypeError("beta must be a non-negative number")
 
         self.style_image = self.scale_image(style_image)
         self.content_image = self.scale_image(content_image)
-        self.alpha = alpha
-        self.beta = beta
+        self.alpha = float(alpha)
+        self.beta = float(beta)
 
     @staticmethod
     def scale_image(image):
         """
         Rescales an image such that its pixels values are between 0 and 1
         and its largest side is 512 pixels
+
+        Args:
+            image: numpy.ndarray of shape (h, w, 3)
+
+        Returns:
+            scaled image as tf.Tensor
         """
         if not isinstance(image, np.ndarray) or \
            image.ndim != 3 or image.shape[2] != 3:
@@ -61,9 +75,9 @@ class NST:
             w_new = 512
             h_new = int(round((h * 512) / w))
 
-        image = tf.expand_dims(image, axis=0)
+        image_expanded = tf.expand_dims(image, axis=0)
         resized_image = tf.image.resize(
-            image,
+            image_expanded,
             size=[h_new, w_new],
             method=tf.image.ResizeMethod.BICUBIC
         )
