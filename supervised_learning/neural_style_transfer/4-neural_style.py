@@ -161,35 +161,38 @@ class NST:
             self.content_image * 255.0
         )
 
-        outputs = self.model(style_preprocessed)
-        self.gram_style_features = [
-            self.gram_matrix(output) for output in outputs[:-1]
-        ]
-
+        style_outputs = self.model(style_preprocessed)
         content_outputs = self.model(content_preprocessed)
+
+        self.gram_style_features = [
+            self.gram_matrix(style_output)
+            for style_output in style_outputs[:-1]
+        ]
         self.content_feature = content_outputs[-1]
 
-    def content_cost(self, content_output):
+    def layer_style_cost(self, style_output, gram_target):
         """
-        Calculates the content cost for the Neural Style Transfer
+        Calculates the style cost for a single layer
 
         Args:
-            content_output: a tf.Tensor of shape (1, h, w, c) containing the
-                            content feature representation of the generated
-                            image
+            style_output: tf.Tensor of shape (1, h, w, c) containing the
+                          layer style output of the generated image
+            gram_target: tf.Tensor of shape (1, c, c) the gram matrix of the
+                         target style output for that layer
 
         Returns:
-            the content cost
+            the layer's style cost
         """
-        if not isinstance(content_output, (tf.Tensor, tf.Variable)) or \
-           len(content_output.shape) != 4:
-            raise TypeError("content_output must be a tensor of rank 4")
+        if not isinstance(style_output, (tf.Tensor, tf.Variable)) or \
+           len(style_output.shape) != 4:
+            raise TypeError("style_output must be a tensor of rank 4")
 
-        if content_output.shape != self.content_feature.shape:
+        c = style_output.shape[-1]
+        if not isinstance(gram_target, (tf.Tensor, tf.Variable)) or \
+           gram_target.shape != (1, c, c):
             raise TypeError(
-                "content_output must have the same shape as self.content_feature"
+                f"gram_target must be a tensor of shape [1, {c}, {c}]"
             )
 
-        return tf.reduce_mean(
-            tf.square(content_output - self.content_feature)
-        ) / 2.0
+        gram_style = self.gram_matrix(style_output)
+        return tf.reduce_mean(tf.square(gram_style - gram_target))
