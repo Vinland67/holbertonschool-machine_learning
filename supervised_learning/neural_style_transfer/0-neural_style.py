@@ -46,8 +46,8 @@ class NST:
 
         self.style_image = self.scale_image(style_image)
         self.content_image = self.scale_image(content_image)
-        self.alpha = float(alpha)
-        self.beta = float(beta)
+        self.alpha = alpha
+        self.beta = beta
 
     @staticmethod
     def scale_image(image):
