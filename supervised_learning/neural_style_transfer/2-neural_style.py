@@ -145,5 +145,5 @@ class NST:
         n = tf.shape(a)[0]
         gram = tf.matmul(a, a, transpose_a=True)
         gram = tf.expand_dims(gram, axis=0)
-        
+
         return gram / tf.cast(n, tf.float32)
