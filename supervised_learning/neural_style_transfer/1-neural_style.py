@@ -94,21 +94,17 @@ class NST:
         Replaces MaxPooling2D layers with AveragePooling2D layers.
         Saves model to self.model.
         """
-        vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+        vgg = tf.keras.applications.VGG19(
+            include_top=False,
+            weights='imagenet'
+        )
         vgg.trainable = False
 
-        # MaxPool layihələrini AveragePooling2D ilə əvəz etmək üçün xüsusi struktur
-        custom_outputs = []
-        
-        # Bütün istənilən layerlərin siyahısı
         target_layers = self.style_layers + [self.content_layer]
 
-        # VGG19 modelini custom Input ilə yenidən qururuq ki, AveragePooling istifadə olunsun
         x = vgg.input
         outputs = []
 
-        model_dict = {vgg.input.name: vgg.input}
-        
         for layer in vgg.layers[1:]:
             if isinstance(layer, tf.keras.layers.MaxPooling2D):
                 x = tf.keras.layers.AveragePooling2D(
