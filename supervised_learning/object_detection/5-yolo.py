@@ -194,28 +194,17 @@ class Yolo:
     def preprocess_images(self, images):
         """
         Preprocesses images for Darknet model input
-
-        Args:
-            images: list of images as numpy.ndarrays
-
-        Returns:
-            tuple of (pimages, image_shapes)
         """
-        input_h = self.model.input.shape[1]
-        input_w = self.model.input.shape[2]
+        input_w = self.model.input.shape[1]
+        input_h = self.model.input.shape[2]
 
         pimages = []
         image_shapes = []
 
         for img in images:
-            # Original shape (height, width)
             image_shapes.append((img.shape[0], img.shape[1]))
-
-            # Resize image using inter-cubic interpolation
             resized = cv2.resize(img, (input_w, input_h),
                                  interpolation=cv2.INTER_CUBIC)
-
-            # Rescale pixel values to [0, 1]
             rescaled = resized / 255.0
             pimages.append(rescaled)
 
