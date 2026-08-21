@@ -245,6 +245,6 @@ class NST:
                 f"content_output must be a tensor of shape {s}"
             )
 
-        return 0.5 * tf.reduce_mean(
+        return 0.5 * tf.reduce_sum(
             tf.square(content_output - self.content_feature)
         )
