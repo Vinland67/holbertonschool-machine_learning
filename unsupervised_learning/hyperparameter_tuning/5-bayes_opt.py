@@ -77,7 +77,7 @@ class BayesianOptimization:
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            if np.any(np.isclose(X_next, self.gp.X)):
+            if X_next in self.gp.X:
                 break
 
             Y_next = self.f(X_next)
