@@ -2,7 +2,7 @@
 """
 Module defining a function that creates a Vanilla Autoencoder
 """
-import tensorflow as tf
+import tensorflow.keras as keras
 
 
 def autoencoder(input_dims, hidden_layers, latent_dims):
@@ -22,24 +22,24 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
         auto is the full autoencoder model
     """
     # Encoder
-    inputs = tf.keras.Input(shape=(input_dims,))
+    inputs = keras.Input(shape=(input_dims,))
     x = inputs
     for nodes in hidden_layers:
-        x = tf.keras.layers.Dense(nodes, activation='relu')(x)
-    latent_outputs = tf.keras.layers.Dense(latent_dims, activation='relu')(x)
-    encoder = tf.keras.Model(inputs=inputs, outputs=latent_outputs)
+        x = keras.layers.Dense(nodes, activation='relu')(x)
+    latent_outputs = keras.layers.Dense(latent_dims, activation='relu')(x)
+    encoder = keras.Model(inputs=inputs, outputs=latent_outputs)
 
     # Decoder
-    decoder_inputs = tf.keras.Input(shape=(latent_dims,))
+    decoder_inputs = keras.Input(shape=(latent_dims,))
     x = decoder_inputs
     for nodes in reversed(hidden_layers):
-        x = tf.keras.layers.Dense(nodes, activation='relu')(x)
-    outputs = tf.keras.layers.Dense(input_dims, activation='sigmoid')(x)
-    decoder = tf.keras.Model(inputs=decoder_inputs, outputs=outputs)
+        x = keras.layers.Dense(nodes, activation='relu')(x)
+    outputs = keras.layers.Dense(input_dims, activation='sigmoid')(x)
+    decoder = keras.Model(inputs=decoder_inputs, outputs=outputs)
 
     # Full Autoencoder
     auto_outputs = decoder(encoder(inputs))
-    auto = tf.keras.Model(inputs=inputs, outputs=auto_outputs)
+    auto = keras.Model(inputs=inputs, outputs=auto_outputs)
 
     auto.compile(optimizer='adam', loss='binary_crossentropy')
 
