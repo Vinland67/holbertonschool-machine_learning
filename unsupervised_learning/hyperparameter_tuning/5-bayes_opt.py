@@ -3,7 +3,6 @@
 Module defining the BayesianOptimization class with optimize method
 """
 import numpy as np
-from scipy.stats import norm
 GP = __import__('2-gp').GaussianProcess
 
 
@@ -39,7 +38,11 @@ class BayesianOptimization:
 
         with np.errstate(divide='ignore'):
             Z = improvement / sigma
-            ei = improvement * norm.cdf(Z) + sigma * norm.pdf(Z)
+
+            pdf = (1.0 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * (Z ** 2))
+            cdf = 0.5 * (1.0 + np.vectorize(np.math.erf)(Z / np.sqrt(2)))
+
+            ei = improvement * cdf + sigma * pdf
             ei[sigma == 0.0] = 0.0
 
         X_next = self.X_s[np.argmax(ei)]
@@ -49,18 +52,11 @@ class BayesianOptimization:
     def optimize(self, iterations=100):
         """
         Optimizes the black-box function
-
-        Args:
-            iterations: maximum number of iterations to perform
-
-        Returns:
-            X_opt: numpy.ndarray of shape (1,) representing optimal point
-            Y_opt: numpy.ndarray of shape (1,) representing optimal value
         """
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            if X_next in self.gp.X:
+            if np.any(self.gp.X == X_next):
                 break
 
             Y_next = self.f(X_next)
