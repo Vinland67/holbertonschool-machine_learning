@@ -3,7 +3,6 @@
 Module defining the BayesianOptimization class with optimize method
 """
 import numpy as np
-from scipy.stats import norm
 GP = __import__('2-gp').GaussianProcess
 
 
@@ -20,13 +19,15 @@ class BayesianOptimization:
         self.f = f
         self.gp = GP(X_init, Y_init, l, sigma_f)
         min_bound, max_bound = bounds
-        self.X_s = np.linspace(min_bound, max_bound, ac_samples).reshape(-1, 1)
+        self.X_s = np.linspace(
+            min_bound, max_bound, ac_samples).reshape(-1, 1)
         self.xsi = xsi
         self.minimize = minimize
 
     def acquisition(self):
         """
-        Calculates the next best sample location using Expected Improvement
+        Calculates the next best sample location using Expected
+        Improvement
         """
         mu, sigma = self.gp.predict(self.X_s)
 
@@ -37,9 +38,11 @@ class BayesianOptimization:
             y_opt = np.max(self.gp.Y)
             improvement = mu - y_opt - self.xsi
 
-        with np.errstate(divide='ignore'):
+        with np.errstate(divide='ignore', invalid='ignore'):
             Z = improvement / sigma
-            ei = improvement * norm.cdf(Z) + sigma * norm.pdf(Z)
+            cdf = 0.5 * (1.0 + np.vectorize(np.math.erf)(Z / np.sqrt(2)))
+            pdf = (1.0 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * (Z ** 2))
+            ei = improvement * cdf + sigma * pdf
             ei[sigma == 0.0] = 0.0
 
         X_next = self.X_s[np.argmax(ei)]
@@ -53,7 +56,7 @@ class BayesianOptimization:
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            if X_next in self.gp.X:
+            if np.any(np.isclose(self.gp.X, X_next)):
                 break
 
             Y_next = self.f(X_next)
