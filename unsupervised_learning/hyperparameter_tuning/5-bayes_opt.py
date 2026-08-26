@@ -3,6 +3,7 @@
 Module defining the BayesianOptimization class with optimize method
 """
 import numpy as np
+from scipy.stats import norm
 GP = __import__('2-gp').GaussianProcess
 
 
@@ -36,23 +37,9 @@ class BayesianOptimization:
             y_opt = np.max(self.gp.Y)
             improvement = mu - y_opt - self.xsi
 
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide='ignore'):
             Z = improvement / sigma
-
-            # Standard normal PDF
-            pdf = (1.0 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * (Z ** 2))
-
-            # Standard normal CDF approximation (no math or scipy allowed)
-            t = 1.0 / (1.0 + 0.2316419 * np.abs(Z))
-            b1 = 0.319381530
-            b2 = -0.356563782
-            b3 = 1.781477937
-            b4 = -1.821255978
-            b5 = 1.330274429
-            prob = pdf * (b1*t + b2*(t**2) + b3*(t**3) + b4*(t**4) + b5*(t**5))
-            cdf = np.where(Z >= 0, 1.0 - prob, prob)
-
-            ei = improvement * cdf + sigma * pdf
+            ei = improvement * norm.cdf(Z) + sigma * norm.pdf(Z)
             ei[sigma == 0.0] = 0.0
 
         X_next = self.X_s[np.argmax(ei)]
@@ -66,8 +53,7 @@ class BayesianOptimization:
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            # Precision check using np.isclose to stop early correctly
-            if np.any(np.isclose(self.gp.X, X_next)):
+            if X_next in self.gp.X:
                 break
 
             Y_next = self.f(X_next)
