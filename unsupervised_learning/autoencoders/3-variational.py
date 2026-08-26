@@ -8,18 +8,6 @@ import tensorflow.keras as keras
 def autoencoder(input_dims, hidden_layers, latent_dims):
     """
     Creates a variational autoencoder model
-
-    Args:
-        input_dims: integer containing the dimensions of the model input
-        hidden_layers: list containing the number of nodes for each hidden
-                       layer in the encoder, respectively
-        latent_dims: integer containing dimensions of latent space
-
-    Returns:
-        encoder, decoder, auto:
-        encoder is the encoder model
-        decoder is the decoder model
-        auto is the full autoencoder model
     """
     # Encoder
     inputs = keras.Input(shape=(input_dims,))
@@ -32,7 +20,7 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
 
     def sampling(args):
         """
-        Sampling layer for reparameterization trick
+        Sampling layer using reparameterization trick
         """
         z_mean, z_log_sig = args
         batch = keras.backend.shape(z_mean)[0]
@@ -41,7 +29,6 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
         return z_mean + keras.backend.exp(z_log_sig / 2) * epsilon
 
     z = keras.layers.Lambda(sampling)([mean, log_sig])
-
     encoder = keras.Model(inputs=inputs, outputs=[z, mean, log_sig])
 
     # Decoder
@@ -50,16 +37,19 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     for nodes in reversed(hidden_layers):
         x = keras.layers.Dense(nodes, activation='relu')(x)
     outputs = keras.layers.Dense(input_dims, activation='sigmoid')(x)
-
     decoder = keras.Model(inputs=decoder_inputs, outputs=outputs)
 
     # Full Autoencoder
-    auto_outputs = decoder(z)
+    auto_outputs = decoder(encoder(inputs)[0])
     auto = keras.Model(inputs=inputs, outputs=auto_outputs)
 
-    # VAE Loss
-    reconstruction_loss = keras.losses.binary_crossentropy(inputs, auto_outputs)
-    reconstruction_loss *= input_dims
+    # Loss Definition
+    reconstruction_loss = keras.backend.binary_crossentropy(
+        inputs, auto_outputs
+    )
+    reconstruction_loss = keras.backend.sum(
+        reconstruction_loss, axis=-1
+    )
 
     kl_loss = 1 + log_sig - keras.backend.square(mean) - \
         keras.backend.exp(log_sig)
