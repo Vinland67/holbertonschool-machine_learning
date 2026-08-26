@@ -8,7 +8,8 @@ GP = __import__('2-gp').GaussianProcess
 
 class BayesianOptimization:
     """
-    Class that performs Bayesian optimization on a noiseless 1D Gaussian process
+    Class that performs Bayesian optimization on a
+    noiseless 1D Gaussian process
     """
     def __init__(self, f, X_init, Y_init, bounds, ac_samples,
                  l=1, sigma_f=1, xsi=0.01, minimize=True):
@@ -24,7 +25,8 @@ class BayesianOptimization:
             l: length parameter for the kernel
             sigma_f: standard deviation for output
             xsi: exploration-exploitation factor for acquisition
-            minimize: bool determining minimization (True) or maximization (False)
+            minimize: bool determining minimization (True) or
+                      maximization (False)
         """
         self.f = f
         self.gp = GP(X_init, Y_init, l, sigma_f)
