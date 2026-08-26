@@ -270,17 +270,6 @@ class NST:
                        beta1=0.9, beta2=0.99):
         """
         Generates the neural style transferred image
-
-        Args:
-            iterations: number of iterations to perform gradient descent
-            step: step at which to print information
-            lr: learning rate for gradient descent
-            beta1: beta1 parameter for Adam optimizer
-            beta2: beta2 parameter for Adam optimizer
-
-        Returns:
-            generated_image: best generated image
-            cost: best cost
         """
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
@@ -290,7 +279,7 @@ class NST:
         if step is not None:
             if not isinstance(step, int):
                 raise TypeError("step must be an integer")
-            if step <= 0 or step > iterations:
+            if step <= 0 or step >= iterations:
                 raise ValueError(
                     "step must be positive and less than iterations"
                 )
