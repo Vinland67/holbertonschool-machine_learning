@@ -3,7 +3,6 @@
 Module defining the BayesianOptimization class with optimize method
 """
 import numpy as np
-from scipy.stats import norm
 GP = __import__('2-gp').GaussianProcess
 
 
@@ -16,18 +15,6 @@ class BayesianOptimization:
                  l=1, sigma_f=1, xsi=0.01, minimize=True):
         """
         Class constructor for BayesianOptimization
-
-        Args:
-            f: black-box function to be optimized
-            X_init: numpy.ndarray of shape (t, 1) representing initial inputs
-            Y_init: numpy.ndarray of shape (t, 1) representing initial outputs
-            bounds: tuple of (min, max) representing search space bounds
-            ac_samples: number of samples to analyze during acquisition
-            l: length parameter for the kernel
-            sigma_f: standard deviation for output
-            xsi: exploration-exploitation factor for acquisition
-            minimize: bool determining minimization (True) or
-                      maximization (False)
         """
         self.f = f
         self.gp = GP(X_init, Y_init, l, sigma_f)
@@ -39,11 +26,6 @@ class BayesianOptimization:
     def acquisition(self):
         """
         Calculates the next best sample location using Expected Improvement
-
-        Returns:
-            X_next: numpy.ndarray of shape (1,) representing next sample point
-            EI: numpy.ndarray of shape (ac_samples,) containing expected
-                improvement of each potential sample
         """
         mu, sigma = self.gp.predict(self.X_s)
 
@@ -54,9 +36,17 @@ class BayesianOptimization:
             y_opt = np.max(self.gp.Y)
             improvement = mu - y_opt - self.xsi
 
+        # Compute standard normal PDF and CDF without scipy
         with np.errstate(divide='ignore'):
             Z = improvement / sigma
-            ei = improvement * norm.cdf(Z) + sigma * norm.pdf(Z)
+
+            # Standard normal PDF
+            pdf = (1.0 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * (Z ** 2))
+
+            # Standard normal CDF using error function approximation
+            cdf = 0.5 * (1.0 + np.vectorize(np.math.erf)(Z / np.sqrt(2)))
+
+            ei = improvement * cdf + sigma * pdf
             ei[sigma == 0.0] = 0.0
 
         X_next = self.X_s[np.argmax(ei)]
@@ -66,18 +56,11 @@ class BayesianOptimization:
     def optimize(self, iterations=100):
         """
         Optimizes the black-box function
-
-        Args:
-            iterations: maximum number of iterations to perform
-
-        Returns:
-            X_opt: numpy.ndarray of shape (1,) representing optimal point
-            Y_opt: numpy.ndarray of shape (1,) representing optimal value
         """
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            if X_next in self.gp.X:
+            if np.any(self.gp.X == X_next):
                 break
 
             Y_next = self.f(X_next)
