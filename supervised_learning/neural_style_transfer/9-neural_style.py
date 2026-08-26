@@ -65,7 +65,8 @@ class NST:
         resized_image = tf.image.resize(
             image_expanded,
             size=[h_new, w_new],
-            method=tf.image.ResizeMethod.BICUBIC
+            method=tf.image.ResizeMethod.BICUBIC,
+            antialias=True
         )
         rescaled_image = resized_image / 255.0
         rescaled_image = tf.clip_by_value(rescaled_image, 0.0, 1.0)
