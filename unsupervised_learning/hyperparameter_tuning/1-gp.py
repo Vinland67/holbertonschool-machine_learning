@@ -51,8 +51,8 @@ class GaussianProcess:
                  whose mean and variance should be calculated
 
         Returns:
-            mu: numpy.ndarray of shape (s,) containing the mean for each point
-            sigma: numpy.ndarray of shape (s,) containing the variance for each point
+            mu: numpy.ndarray of shape (s,) containing the mean
+            sigma: numpy.ndarray of shape (s,) containing the variance
         """
         K_s = self.kernel(self.X, X_s)
         K_ss = self.kernel(X_s, X_s)
