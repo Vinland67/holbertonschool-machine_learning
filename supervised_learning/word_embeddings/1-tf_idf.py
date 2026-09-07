@@ -1,67 +1,33 @@
 #!/usr/bin/env python3
 """
-Module defining the tf_idf function
+Creates a TF-IDF embedding matrix
 """
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def tf_idf(sentences, vocab=None):
     """
-    Creates a TF-IDF embedding matrix
+    Creates a TF-IDF embedding.
 
     Args:
         sentences: list of sentences to analyze
-        vocab: list of vocabulary words to use, or None
+        vocab: list of the vocabulary words to use for the analysis.
+               If None, all words within sentences should be used.
 
     Returns:
         embeddings: numpy.ndarray of shape (s, f) containing the embeddings
-        features: list of the features used for embeddings
+        features: numpy.ndarray of the features used for embeddings
     """
-    cleaned_sentences = []
-    for sentence in sentences:
-        words = []
-        for word in sentence.lower().split():
-            cleaned = "".join(c for c in word if c.isalnum())
-            if cleaned:
-                words.append(cleaned)
-        cleaned_sentences.append(words)
+    vectorizer = TfidfVectorizer(vocabulary=vocab)
+    X = vectorizer.fit_transform(sentences)
+    embeddings = X.toarray()
 
-    if vocab is None:
-        vocab_set = set()
-        for words in cleaned_sentences:
-            for word in words:
-                vocab_set.add(word)
-        features = sorted(list(vocab_set))
+    if hasattr(vectorizer, 'get_feature_names_out'):
+        features = vectorizer.get_feature_names_out()
     else:
-        features = sorted(list(set(vocab)))
+        features = vectorizer.get_feature_names()
 
-    s = len(sentences)
-    f = len(features)
-    tf = np.zeros((s, f), dtype=float)
-
-    for i, words in enumerate(cleaned_sentences):
-        if len(words) == 0:
-            continue
-        for word in words:
-            if word in features:
-                j = features.index(word)
-                tf[i, j] += 1
-        tf[i] /= len(words)
-
-    idf = np.zeros(f, dtype=float)
-    for j, feature in enumerate(features):
-        docs_containing_word = 0
-        for words in cleaned_sentences:
-            if feature in words:
-                docs_containing_word += 1
-        # Sklearn style smooth IDF
-        idf[j] = np.log((s + 1) / (docs_containing_word + 1)) + 1
-
-    embeddings = tf * idf
-
-    for i in range(s):
-        norm = np.linalg.norm(embeddings[i])
-        if norm > 0:
-            embeddings[i] /= norm
+    features = np.array(features)
 
     return embeddings, features
