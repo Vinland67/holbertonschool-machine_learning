@@ -22,8 +22,6 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
     Returns:
         V: updated value estimate
     """
-    n_states = V.shape[0]
-
     for episode in range(episodes):
         state, _ = env.reset()
         episode_data = []
@@ -38,14 +36,13 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
 
             state = next_state
 
-        episode_data = np.array(episode_data, dtype=object)
         G = 0
-
-        for t in range(len(episode_data) - 1, -1, -1):
+        for t in reversed(range(len(episode_data))):
             s_t, r_t = episode_data[t]
             G = gamma * G + r_t
 
-            if s_t not in episode_data[:t, 0]:
+            states_in_episode = [x[0] for x in episode_data[:t]]
+            if s_t not in states_in_episode:
                 V[s_t] = V[s_t] + alpha * (G - V[s_t])
 
     return V
