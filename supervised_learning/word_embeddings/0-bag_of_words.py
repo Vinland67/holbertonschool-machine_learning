@@ -3,7 +3,6 @@
 Module defining the bag_of_words function
 """
 import numpy as np
-import re
 
 
 def bag_of_words(sentences, vocab=None):
@@ -20,7 +19,18 @@ def bag_of_words(sentences, vocab=None):
     """
     cleaned_sentences = []
     for sentence in sentences:
-        words = re.findall(r'\b[a-zA-Z0-9]+\b', sentence.lower())
+        # Lowercase and split by non-alphanumeric, filtering out empty strings
+        words = []
+        current_word = []
+        for char in sentence.lower():
+            if char.isalnum():
+                current_word.append(char)
+            else:
+                if current_word:
+                    words.append("".join(current_word))
+                    current_word = []
+        if current_word:
+            words.append("".join(current_word))
         cleaned_sentences.append(words)
 
     if vocab is None:
