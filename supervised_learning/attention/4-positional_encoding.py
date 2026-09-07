@@ -20,7 +20,9 @@ def positional_encoding(max_seq_len, dm):
     pos = np.arange(max_seq_len)[:, np.newaxis]
     i = np.arange(dm)[np.newaxis, :]
 
-    angle_rates = pos / np.power(10000, (2 * (i // 2)) / np.float32(dm))
+    angle_rates = pos / np.power(
+        10000, (2 * (i // 2)) / np.float32(dm)
+    )
 
     # Apply sin to even indices in the array; 2i
     PE[:, 0::2] = np.sin(angle_rates[:, 0::2])
