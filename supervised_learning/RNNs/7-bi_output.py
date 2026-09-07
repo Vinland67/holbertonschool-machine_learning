@@ -81,8 +81,7 @@ class BidirectionalCell:
 
         for step in range(t):
             logits = np.matmul(H[step], self.Wy) + self.by
-            Y[step] = np.exp(logits) / np.sum(np.exp(logits),
-                                             axis=1,
-                                             keepdims=True)
+            exp_logits = np.exp(logits)
+            Y[step] = exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
 
         return Y
