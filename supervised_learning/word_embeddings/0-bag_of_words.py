@@ -19,18 +19,13 @@ def bag_of_words(sentences, vocab=None):
     """
     cleaned_sentences = []
     for sentence in sentences:
-        # Lowercase and split by non-alphanumeric, filtering out empty strings
+        # Aşağıdakı təmizləmə apostrofları və xüsusi simvolları nəzərə alır
         words = []
-        current_word = []
-        for char in sentence.lower():
-            if char.isalnum():
-                current_word.append(char)
-            else:
-                if current_word:
-                    words.append("".join(current_word))
-                    current_word = []
-        if current_word:
-            words.append("".join(current_word))
+        for word in sentence.lower().split():
+            # Təmiz söz əldə etmək üçün hərflər və rəqəmlər saxlanılır
+            cleaned = "".join(c for c in word if c.isalnum())
+            if cleaned:
+                words.append(cleaned)
         cleaned_sentences.append(words)
 
     if vocab is None:
