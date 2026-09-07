@@ -26,12 +26,17 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
         state, _ = env.reset()
         episode_data = []
 
-        # Epizodun simulyasiyası
         for step in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
 
-            # Yalnız cari vəziyyəti və qazanılan mükafatı saxlayırıq
+            # Əgər agent deşiyə düşübsə (reward 0-dır amma oyun bitib)
+            if terminated and reward == 0:
+                reward = V[next_state]  # Son vəziyyətin öz dəyərini (-1) götürürük
+            # Əgər agent hədəfə çatıbsa
+            elif terminated and reward == 1:
+                reward = V[next_state]  # Hədəfin dəyərini (1) götürürük
+
             episode_data.append((state, reward))
 
             if terminated or truncated:
@@ -40,16 +45,9 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
             state = next_state
 
         G = 0
-        # First-visit təyini üçün vəziyyətlərin epizoddakı indekslərini yoxlayırıq
-        states_in_episode = [step[0] for step in episode_data]
-
-        # Epizodu sondan əvvələ doğru oxuyaraq G (Return) dəyərini hesablayırıq
-        for t in reversed(range(len(episode_data))):
-            s_t, r_t = episode_data[t]
+        # Hər bir epizod bitdikdən sonra Every-Visit yeniləməsi edirik
+        for s_t, r_t in reversed(episode_data):
             G = gamma * G + r_t
-
-            # Əgər bu vəziyyət epizod daxilində ilk qarşılaşmadırsa (First-Visit)
-            if s_t not in states_in_episode[:t]:
-                V[s_t] = V[s_t] + alpha * (G - V[s_t])
+            V[s_t] = V[s_t] + alpha * (G - V[s_t])
 
     return V
