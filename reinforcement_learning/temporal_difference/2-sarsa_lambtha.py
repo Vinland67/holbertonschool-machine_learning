@@ -56,7 +56,8 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
             next_state, reward, terminated, truncated, _ = env.step(action)
             next_action = epsilon_greedy(Q, next_state, epsilon)
 
-            delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
+            delta = (reward + gamma * Q[next_state, next_action] -
+                     Q[state, action])
             E[state, action] += 1
 
             Q += alpha * delta * E
