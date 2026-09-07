@@ -1,3 +1,3 @@
-# Recurrent Neural Networks (RNNs)
+# Time Series Forecasting - Bitcoin (BTC)
 
-This directory contains implementations of Recurrent Neural Networks and their components.
+This project uses Recurrent Neural Networks (RNNs) with TensorFlow/Keras to forecast Bitcoin's closing price for the next hour based on the past 24 hours of data.
