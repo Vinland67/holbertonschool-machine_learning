@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-Module defining the word2vec_model function using gensim
+Module for Word2Vec model training using gensim
 """
 import gensim
 
 
-def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
-                   negative=5, cbow=True, epochs=5, seed=0, workers=1):
+def word2vec_model(sentences, vector_size=100, min_count=5,
+                   window=5, negative=5, cbow=True,
+                   epochs=5, seed=0, workers=1):
     """
-    Creates, builds, and trains a gensim word2vec model
+    Creates, builds, and trains a gensim word2vec model.
 
     Args:
         sentences: list of sentences to be trained on
@@ -22,20 +23,18 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
         workers: number of worker threads
 
     Returns:
-        trained gensim Word2Vec model
+        the trained model
     """
     sg = 0 if cbow else 1
-
     model = gensim.models.Word2Vec(
         sentences=sentences,
         vector_size=vector_size,
-        window=window,
         min_count=min_count,
-        sg=sg,
+        window=window,
         negative=negative,
+        sg=sg,
         seed=seed,
         workers=workers,
         epochs=epochs
     )
-
     return model
