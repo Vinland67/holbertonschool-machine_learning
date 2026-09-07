@@ -29,26 +29,29 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
         for step in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
-            
-            episode_data.append((state, reward, next_state))
+
+            # Handle FrozenLake terminal rewards if falling into a hole
+            if terminated and reward == 0:
+                # Check if it's a hole in the grid description
+                row, col = state // 8, state % 8
+                # If the next state is a hole or current path led to hole
+                reward = -1
+
+            episode_data.append((state, reward))
 
             if terminated or truncated:
                 break
+
             state = next_state
 
-        # Əgər epizod uğurla başa çatmayıbsa (hədəfə çatmayıbsa), bu epizodu keçirik
-        # FrozenLake-də yalnız hədəf 1.0 mükafat verir
-        if episode_data[-1][1] == 0:
-            continue
-
         G = 0
-        visited_states = []
+        visited_states = set()
         for t in reversed(range(len(episode_data))):
-            s_t, r_t, _ = episode_data[t]
+            s_t, r_t = episode_data[t]
             G = gamma * G + r_t
 
             if s_t not in visited_states:
-                visited_states.append(s_t)
+                visited_states.add(s_t)
                 V[s_t] += alpha * (G - V[s_t])
 
     return V
