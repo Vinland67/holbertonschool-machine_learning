@@ -54,16 +54,11 @@ def tf_idf(sentences, vocab=None):
         for words in cleaned_sentences:
             if feature in words:
                 docs_containing_word += 1
-        if docs_containing_word > 0:
-            idf[j] = np.log((s / docs_containing_word)) + 1
-        else:
-            idf[j] = np.log(s) + 1
+        # Sklearn style smooth IDF
+        idf[j] = np.log((s + 1) / (docs_containing_word + 1)) + 1
 
     embeddings = tf * idf
 
-    # Normalize or adjust according to standard scikit-learn TF-IDF L2 norm if needed,
-    # but here standard raw TF * IDF or standard norm. Let's check standard l2 norm:
-    # Holberton's TF-IDF often uses Euclidean (L2) normalization on rows.
     for i in range(s):
         norm = np.linalg.norm(embeddings[i])
         if norm > 0:
