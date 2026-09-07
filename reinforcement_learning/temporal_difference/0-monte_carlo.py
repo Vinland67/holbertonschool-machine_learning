@@ -22,10 +22,6 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
     Returns:
         V: updated value estimate
     """
-    # Deşiklərin indekslərini tapırıq ki, onların dəyərini sabit saxlayaq
-    frozen_lake = env.unwrapped.desc.flatten()
-    hole_indices = np.where(frozen_lake == b'H')[0]
-
     for episode in range(episodes):
         state, _ = env.reset()
         episode_data = []
@@ -33,7 +29,6 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
         for step in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
-
             episode_data.append((state, reward))
 
             if terminated or truncated:
@@ -42,16 +37,9 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
             state = next_state
 
         G = 0
-        # First-visit Monte Carlo üçün epizodda ilk dəfə qarşılaşan vəziyyətləri tapırıq
-        visited_states = [x[0] for x in episode_data]
-        
         for t in reversed(range(len(episode_data))):
             s_t, r_t = episode_data[t]
             G = gamma * G + r_t
-
-            # Əgər bu vəziyyət epizodun əvvəlindən bura qədər olan ilk qarşılaşmadırsa
-            # və terminal deşik vəziyyəti deyilsə, dəyərini yeniləyirik
-            if s_t not in visited_states[:t] and s_t not in hole_indices:
-                V[s_t] = V[s_t] + alpha * (G - V[s_t])
+            V[s_t] = V[s_t] + alpha * (G - V[s_t])
 
     return V
