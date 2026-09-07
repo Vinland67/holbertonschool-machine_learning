@@ -13,28 +13,20 @@ def sdp_attention(Q, K, V, mask=None):
         Q: query tensor of shape (..., seq_len_q, dk)
         K: key tensor of shape (..., seq_len_v, dk)
         V: value tensor of shape (..., seq_len_v, dv)
-        mask: optional mask tensor that can be broadcast into (..., seq_len_q, seq_len_v)
+        mask: optional mask tensor that can be broadcast
+              into (..., seq_len_q, seq_len_v)
 
     Returns:
         output, weights
     """
-    # Get dk from the last dimension of K
     dk = tf.cast(tf.shape(K)[-1], tf.float32)
-
-    # MatMul of Q and K transpose: (..., seq_len_q, seq_len_v)
     matmul_qk = tf.matmul(Q, K, transpose_b=True)
-
-    # Scale by sqrt(dk)
     scaled_attention_logits = matmul_qk / tf.math.sqrt(dk)
 
-    # Add mask if not None
     if mask is not None:
         scaled_attention_logits += (mask * -1e9)
 
-    # Softmax to get weights: (..., seq_len_q, seq_len_v)
     weights = tf.nn.softmax(scaled_attention_logits, axis=-1)
-
-    # MatMul of weights and V: (..., seq_len_q, dv)
     output = tf.matmul(weights, V)
 
     return output, weights
