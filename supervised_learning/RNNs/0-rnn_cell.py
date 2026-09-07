@@ -28,8 +28,10 @@ class RNNCell:
         Performs forward propagation for one time step
 
         Args:
-            h_prev: numpy.ndarray of shape (m, h) containing previous hidden state
-            x_t: numpy.ndarray of shape (m, i) containing data input for cell
+            h_prev: numpy.ndarray of shape (m, h) containing
+                    previous hidden state
+            x_t: numpy.ndarray of shape (m, i) containing
+                 data input for cell
 
         Returns:
             h_next: next hidden state
