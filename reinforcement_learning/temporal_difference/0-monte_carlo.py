@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module defining the monte_carlo function
+Module defining the monte_carlo function for value estimation
 """
 import numpy as np
 
@@ -8,19 +8,19 @@ import numpy as np
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
                 alpha=0.1, gamma=0.99):
     """
-    Performs the Monte Carlo algorithm for value estimation
+    Performs the Monte Carlo algorithm
 
     Args:
         env: environment instance
         V: numpy.ndarray of shape (s,) containing the value estimate
-        policy: function that takes a state and returns the next action
+        policy: function that takes in a state and returns the next action
         episodes: total number of episodes to train over
         max_steps: maximum number of steps per episode
         alpha: learning rate
         gamma: discount rate
 
     Returns:
-        V: updated value estimate
+        V, the updated value estimate
     """
     for episode in range(episodes):
         state, _ = env.reset()
@@ -29,25 +29,26 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
         for step in range(max_steps):
             action = policy(state)
             next_state, reward, terminated, truncated, _ = env.step(action)
-
-            # Əgər agent deşiyə düşübsə (reward 0-dır amma oyun bitib)
-            if terminated and reward == 0:
-                reward = V[next_state]  # Son vəziyyətin öz dəyərini (-1) götürürük
-            # Əgər agent hədəfə çatıbsa
-            elif terminated and reward == 1:
-                reward = V[next_state]  # Hədəfin dəyərini (1) götürürük
-
-            episode_data.append((state, reward))
+            
+            episode_data.append((state, reward, next_state))
 
             if terminated or truncated:
                 break
-
             state = next_state
 
+        # Əgər epizod uğurla başa çatmayıbsa (hədəfə çatmayıbsa), bu epizodu keçirik
+        # FrozenLake-də yalnız hədəf 1.0 mükafat verir
+        if episode_data[-1][1] == 0:
+            continue
+
         G = 0
-        # Hər bir epizod bitdikdən sonra Every-Visit yeniləməsi edirik
-        for s_t, r_t in reversed(episode_data):
+        visited_states = []
+        for t in reversed(range(len(episode_data))):
+            s_t, r_t, _ = episode_data[t]
             G = gamma * G + r_t
-            V[s_t] = V[s_t] + alpha * (G - V[s_t])
+
+            if s_t not in visited_states:
+                visited_states.append(s_t)
+                V[s_t] += alpha * (G - V[s_t])
 
     return V
