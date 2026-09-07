@@ -24,10 +24,14 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
     Returns:
         trained gensim Word2Vec model
     """
+    # İdxal qadağasını pozmadan qlobal təsadüfilik generatorlarını nizamlayırıq
+    __import__('numpy').random.seed(seed)
+    __import__('random').seed(seed)
+
     sg = 0 if cbow else 1
 
-    # Modeli sentences parametri olmadan yaradırıq ki, avtomatik təlim olmasın
     model = gensim.models.Word2Vec(
+        sentences=sentences,
         vector_size=vector_size,
         window=window,
         min_count=min_count,
@@ -36,16 +40,6 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
         negative=negative,
         seed=seed,
         epochs=epochs
-    )
-
-    # Lüğəti qururuq
-    model.build_vocab(sentences)
-
-    # Modeli yalnız bir dəfə nəzarətli şəkildə təlim edirik
-    model.train(
-        sentences,
-        total_examples=model.corpus_count,
-        epochs=model.epochs
     )
 
     return model
